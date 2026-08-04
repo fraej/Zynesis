@@ -14,6 +14,9 @@ src/Tests/Testing
 CMakeCache.txt
 CMakeFiles
 build
+build-vst3/
+build-vst3-win/
+dist/
 doc/gen/
 doc/zynaddsubfx.html
 doc/zynaddsubfx.pdf

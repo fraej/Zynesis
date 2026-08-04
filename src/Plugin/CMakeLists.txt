@@ -1,5 +1,10 @@
 add_compile_options(-Wno-parentheses) # disable warnings from Lv2 headers
 
+if(NOT LegacyPluginFormats)
+    add_subdirectory(ZynAddSubFX)
+    return()
+endif()
+
 add_executable(lv2-ttl-generator ${CMAKE_SOURCE_DIR}/DPF/utils/lv2-ttl-generator/lv2_ttl_generator.c)
 
 CHECK_LIBRARY_EXISTS(dl dlopen "" LIBDL_FOUND)

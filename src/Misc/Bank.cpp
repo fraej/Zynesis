@@ -32,7 +32,7 @@
 #include <windows.h>
 #endif
 
-#ifdef __APPLE__
+#if !defined(WIN32)
 #include <dlfcn.h>
 
 static const char* my_dylib_path () {
@@ -384,19 +384,30 @@ void Bank::rescanforbanks()
         }
     }
 #endif
-#ifdef __APPLE__
+#if !defined(WIN32)
    {
         const char* path = my_dylib_path ();
-        if (path && strstr(path, "ZynAddSubFX.dylib") && strlen (path) < 1000) {
+        if (path && strlen (path) < 1000) {
             char tmp[1024];
             strcpy (tmp, path);
-            strstr (tmp, "ZynAddSubFX.dylib")[0] = 0; // LV2
-            strcat (tmp, "banks");
-            scanrootdir(tmp);
-            strcpy (tmp, path);
-            strstr (tmp, "ZynAddSubFX.dylib")[0] = 0;
-            strcat (tmp, "../Resources/banks"); // VST
-            scanrootdir(tmp);
+#ifdef __APPLE__
+            if (strstr(tmp, "ZynAddSubFX.dylib"))
+            {
+                strstr (tmp, "ZynAddSubFX.dylib")[0] = 0; // LV2
+                strcat (tmp, "banks");
+                scanrootdir(tmp);
+                strcpy (tmp, path);
+                strstr (tmp, "ZynAddSubFX.dylib")[0] = 0;
+                strcat (tmp, "../Resources/banks"); // VST
+                scanrootdir(tmp);
+            }
+#else
+            // Linux VST3 modules live in Contents/x86_64-linux while the
+            // bundled instruments live in Contents/Resources/banks.
+            const std::filesystem::path modulePath(path);
+            scanrootdir((modulePath.parent_path() / "../Resources/banks")
+                            .lexically_normal().string());
+#endif
         }
    }
 #endif

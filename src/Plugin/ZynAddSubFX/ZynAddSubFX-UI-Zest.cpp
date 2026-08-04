@@ -13,12 +13,14 @@
 
 #if !defined(WIN32) && !defined(__APPLE__)
 #include <string>
+#include <cstdio>
 #include <unistd.h>
 #include "zyn-config.h"
 #endif
 
 // DPF includes
 #include "DistrhoUI.hpp"
+#include "DistrhoPluginUtils.hpp"
 #ifdef WIN32
 #include <windows.h>
 #else
@@ -27,6 +29,17 @@
 #endif
 #include <dlfcn.h>
 #endif
+
+ #ifdef WIN32
+static HMODULE get_zyn_module()
+{
+    HMODULE module = nullptr;
+    GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                           GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                       reinterpret_cast<LPCSTR>(&get_zyn_module), &module);
+    return module;
+}
+ #endif
 
 typedef void *zest_t;
 struct zest_handles {
@@ -57,9 +70,10 @@ public:
         printf("[INFO] Opened the zynaddsubfx UI...\n");
 #ifdef WIN32
         char path[1024];
-        GetModuleFileName(GetModuleHandle("ZynAddSubFX.dll"), path, sizeof(path));
-        if(strstr(path, "ZynAddSubFX.dll"))
-            strstr(path, "ZynAddSubFX.dll")[0] = 0;
+        GetModuleFileNameA(get_zyn_module(), path, sizeof(path));
+        char *last_separator = strrchr(path, '\\');
+        if (last_separator)
+            last_separator[1] = 0;
         strcat(path, "libzest.dll");
         printf("[DEBUG] Loading zest library from <%s>\n", path);
         handle = LoadLibrary(path);
@@ -72,6 +86,20 @@ public:
         if(!handle) // VST
             handle = dlopen("@loader_path/../Resources/libzest.dylib", RTLD_LAZY);
 #else
+        // A VST3 editor is loaded from the component bundle.  Resolve the
+        // Zest runtime from Contents/Resources first so hosts do not depend
+        // on their current working directory or a system installation.
+        if (getBundlePath())
+        {
+            const char* const resources = getResourcePath(getBundlePath());
+            if (resources && *resources)
+            {
+                std::string bundled = resources;
+                bundled += "/libzest.so";
+                if (access(bundled.c_str(), R_OK) == 0)
+                    handle = dlopen(bundled.c_str(), RTLD_NOW | RTLD_LOCAL);
+            }
+        }
         if(zyn::fusion_dir && *zyn::fusion_dir)
         {
             std::string fusion = zyn::fusion_dir;
@@ -90,7 +118,11 @@ public:
             handle = dlopen("libzest.so", RTLD_LAZY);
 #endif
         if(!handle) {
+ #ifdef WIN32
+            printf("[ERROR] Cannot Open libzest.dll\n");
+ #else
             printf("[ERROR] Cannot Open libzest.so\n");
+ #endif
 #ifndef WIN32
             printf("[ERROR] '%s'\n", dlerror());
 #endif
@@ -114,6 +146,19 @@ public:
             get_sym(special);
             get_sym(resize);
             get_sym(forget_all_state);
+
+            if (!z.zest_open || !z.zest_close || !z.zest_setup ||
+                !z.zest_draw || !z.zest_tick || !z.zest_resize)
+            {
+                fputs("[ERROR] libzest.so is missing required symbols\n", stderr);
+#ifdef WIN32
+                FreeLibrary(handle);
+#else
+                dlclose(handle);
+#endif
+                handle = nullptr;
+                memset(&z, 0, sizeof(z));
+            }
         }
         oscPort = -1;
         printf("[INFO] Ready to run\n");
@@ -164,7 +209,7 @@ protected:
         // Tell Zest that we need to reload the UI.
         // Currently Zyn-Fusion doesn't use built-in program,
         //   and this event may not be raised.
-        if(z.zest)
+        if(z.zest && z.zest_forget_all_state)
             z.zest_forget_all_state(z.zest);
     }
 
@@ -177,7 +222,7 @@ protected:
         // Tell Zest that we need to reload the UI.
         // This event will be raised when you load a preset from your host,
         //   or during UI loads.
-        if(z.zest)
+        if(z.zest && z.zest_forget_all_state)
             z.zest_forget_all_state(z.zest);
     }
 
@@ -186,31 +231,40 @@ protected:
 
     bool onScroll(const ScrollEvent &ev) override
     {
-        if(z.zest)
+        if(z.zest && z.zest_scroll)
             z.zest_scroll(z.zest, ev.pos.getX(), ev.pos.getY(), ev.delta.getX(), ev.delta.getY(), ev.mod);
-        return false;
+        return true;
     }
 
     bool onSpecial(const SpecialEvent &ev) override
     {
         printf("special event = %d, %d\n", ev.key, ev.press);
-        if(z.zest)
+        if(z.zest && z.zest_special)
             z.zest_special(z.zest, ev.key, ev.press);
-        return false;
+        return true;
     }
 
     bool onMouse(const MouseEvent &m) override
     {
         if(z.zest)
-            z.zest_mouse(z.zest, m.button, m.press, m.pos.getX(), m.pos.getY(), m.mod);
-        return false;
+        {
+            // Zest's legacy mouse callback stores only the button event and
+            // consumes the latest cursor position separately.  Hosts are
+            // allowed to send a button event without a preceding motion
+            // event, so update the cursor explicitly before forwarding it.
+            if (z.zest_motion)
+                z.zest_motion(z.zest, m.pos.getX(), m.pos.getY(), m.mod);
+            if (z.zest_mouse)
+                z.zest_mouse(z.zest, m.button, m.press, m.pos.getX(), m.pos.getY(), m.mod);
+        }
+        return true;
     }
 
     bool onMotion(const MotionEvent &m) override
     {
-        if(z.zest)
+        if(z.zest && z.zest_motion)
             z.zest_motion(z.zest, m.pos.getX(), m.pos.getY(), m.mod);
-        return false;
+        return true;
     }
 
    /**
@@ -233,6 +287,10 @@ protected:
             z.zest = z.zest_open(address);
             printf("[INFO:Zyn] zest_setup(%s)\n", address);
             z.zest_setup(z.zest);
+            // The host may deliver the initial resize before Zest exists.
+            // Apply the current editor dimensions now so the embedded UI
+            // does not remain confined to its 1181x659 default area.
+            z.zest_resize(z.zest, getWidth(), getHeight());
         }
 
         z.zest_draw(z.zest);

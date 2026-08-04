@@ -4,6 +4,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
     ${CMAKE_SOURCE_DIR}/DPF/dgl
     ${CMAKE_SOURCE_DIR}/DPF/dgl/src)
 
+if(LegacyPluginFormats)
+
 if(NtkGui)
 
 # UI Enabled using NTK: embed + external
@@ -225,4 +227,57 @@ install(TARGETS ZynAddSubFX_lv2_ui LIBRARY DESTINATION ${PluginLibDir}/lv2/ZynAd
 install(FILES
         ${CMAKE_CURRENT_BINARY_DIR}/lv2/ZynAddSubFX_ui.ttl
         DESTINATION ${PluginLibDir}/lv2/ZynAddSubFX.lv2/)
+endif()
+
+endif()
+
+if(Vst3Enable AND ZestGui AND (UNIX OR WIN32) AND NOT APPLE)
+    if(WIN32)
+        find_package(OpenGL REQUIRED)
+    else()
+        find_package(OpenGL REQUIRED COMPONENTS OpenGL GLX)
+    endif()
+    # Modern DPF supplies the VST3 component/controller pair and the embedded
+    # OpenGL editor.  The synth itself remains the existing ZynAddSubFX DSP.
+    dpf_add_plugin(ZynAddSubFX
+        TARGETS vst3
+        UI_TYPE opengl
+        FILES_DSP
+            ${CMAKE_SOURCE_DIR}/src/globals.cpp
+            ${CMAKE_SOURCE_DIR}/src/UI/ConnectionDummy.cpp
+            ZynAddSubFX.cpp
+        FILES_UI
+            ZynAddSubFX-UI-Zest.cpp)
+
+    target_compile_definitions(ZynAddSubFX PUBLIC
+        ZEST_GUI
+        DGL_OPENGL
+        HAVE_DGL)
+    target_include_directories(ZynAddSubFX PUBLIC
+        ${CMAKE_SOURCE_DIR}/src
+        ${CMAKE_BINARY_DIR}/src)
+    target_link_libraries(ZynAddSubFX-dsp PUBLIC
+        zynaddsubfx_core
+        zynaddsubfx_gui_bridge
+        ${LIBLO_LIBRARIES})
+    if(NOT WIN32)
+        target_link_libraries(ZynAddSubFX-vst3 PRIVATE
+            OpenGL::OpenGL
+            OpenGL::GLX)
+    else()
+        target_link_libraries(ZynAddSubFX-vst3 PRIVATE
+            ws2_32
+            winmm
+            wsock32
+            iphlpapi
+            winpthread)
+    endif()
+    # dpf-opengl is a static archive.  Keep the GL provider libraries on the
+    # final link line even though the archive appears later than them.
+    target_link_options(ZynAddSubFX-vst3 PRIVATE -Wl,--no-as-needed)
+
+    install(DIRECTORY
+        ${CMAKE_BINARY_DIR}/bin/ZynAddSubFX.vst3
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/vst3
+        OPTIONAL)
 endif()

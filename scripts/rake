@@ -1,0 +1,3 @@
+#!/usr/bin/env bash
+set -e
+exec "${ZYN_RUBY:-ruby}" "${ZYN_RAKE_SCRIPT:-rake}" "$@"

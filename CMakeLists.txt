@@ -1,10 +1,18 @@
 cmake_minimum_required(VERSION 3.10)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 project(zynaddsubfx)
+include(GNUInstallDirs)
 set(VERSION_MAJOR "3")
 set(VERSION_MINOR "0")
 set(VERSION_REVISION "7")
 cmake_policy(SET CMP0072 NEW)
+
+# The VST3 build uses the current DPF CMake integration.  Keep DPF's own
+# examples/libraries out of this project; the plugin target below creates the
+# exact DGL resources it needs.
+set(DPF_LIBRARIES OFF CACHE BOOL "Build DPF libraries" FORCE)
+set(DPF_EXAMPLES OFF CACHE BOOL "Build DPF examples" FORCE)
+add_subdirectory(DPF EXCLUDE_FROM_ALL)
 
 #Set data directory, if any
 if(DEFINED ZYN_DATADIR)
@@ -74,4 +82,3 @@ configure_file("${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
 add_custom_target(uninstall
                   "${CMAKE_COMMAND}" -P
                   "${CMAKE_CURRENT_BINARY_DIR}/cmake/cmake_uninstall.cmake")
-

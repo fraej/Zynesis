@@ -110,6 +110,9 @@ SET (PluginLibDir "lib" CACHE STRING
     "Install directory for plugin libraries PREFIX/PLUGIN_LIB_DIR/{lv2,vst}")
 SET (DemoMode FALSE CACHE BOOL "Enable 10 minute silence")
 SET (PluginEnable TRUE CACHE BOOL "Enable Plugins")
+SET (Vst3Enable TRUE CACHE BOOL "Build the ZynAddSubFX VST3 instrument")
+SET (LegacyPluginFormats FALSE CACHE BOOL
+    "Build the legacy VST2/LV2/effect targets")
 SET (ZynFusionDir "" CACHE STRING "Developers only: zest binary's dir; useful if fusion is not system-installed.")
 mark_as_advanced(FORCE ZynFusionDir)
 
@@ -354,6 +357,11 @@ include_directories(${LIBLO_INCLUDE_DIRS})
 add_definitions(-DUSE_NSM=1)
 list(APPEND AUDIO_LIBRARIES ${LIBLO_LIBRARIES})
 list(APPEND AUDIO_LIBRARY_DIRS ${LIBLO_LIBRARY_DIRS})
+if(${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
+    # The cross-built static liblo archive uses Winsock and the IP helper API.
+    # Keep these after liblo in the final link line.
+    list(APPEND LIBLO_LIBRARIES ws2_32 iphlpapi)
+endif()
 message(STATUS "Compiling with liblo")
 
 # other include directories

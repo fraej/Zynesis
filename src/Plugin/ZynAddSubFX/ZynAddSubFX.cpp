@@ -27,7 +27,11 @@
 #include "extra/ScopedPointer.hpp"
 
 #include <lo/lo.h>
+#include <rtosc/rtosc.h>
 #include <rtosc/thread-link.h>
+#include <algorithm>
+#include <cstdlib>
+#include <cstring>
 
 /* ------------------------------------------------------------------------------------------------------------
  * MiddleWare thread class */
@@ -116,6 +120,14 @@ public:
           oscPort(0),
           middlewareThread(new MiddleWareThread())
     {
+        // DPF creates a metadata-only instance while exporting the VST3
+        // factory. Never start the synth/OSC runtime for that instance.
+        if (isDummyInstance())
+        {
+            defaultState = ::strdup("");
+            return;
+        }
+
         synth.buffersize = static_cast<int>(getBufferSize());
         synth.samplerate = static_cast<uint>(getSampleRate());
 
@@ -248,6 +260,8 @@ protected:
             return oscPort;
         }
         if(index <= kParamSlot16) {
+            if (!master)
+                return 0.5f;
             return master->automate.getSlot(index - kParamSlot1);
         }
         return 0.0f;
@@ -261,7 +275,7 @@ protected:
     */
     void setParameterValue(uint32_t index, float value) noexcept override
     {
-        if(index <= kParamSlot16)
+        if(index <= kParamSlot16 && master)
             master->automate.setSlot(index - kParamSlot1, value);
     }
 
@@ -274,7 +288,7 @@ protected:
     */
     void initProgramName(uint32_t index, String& programName) override
     {
-        programName = middleware->getProgramName(index).c_str();
+        programName = middleware ? middleware->getProgramName(index).c_str() : "Default";
     }
 
    /**
@@ -309,7 +323,8 @@ protected:
     */
     String getState(const char*) const override
     {
-        return String(_getState(), false);
+        char* const state = _getState();
+        return state ? String(state, false) : String("");
     }
 
    /**
@@ -317,6 +332,9 @@ protected:
     */
     void setState(const char* key, const char* value) override
     {
+        if (!master || !middleware)
+            return;
+
         const MiddleWareThread::ScopedStopper mwss(*middlewareThread);
         const MutexLocker cml(mutex);
 
@@ -530,7 +548,7 @@ private:
     zyn::MiddleWare* middleware;
     zyn::SYNTH_T     synth;
 
-    Mutex mutex;
+    mutable Mutex mutex;
     char* defaultState;
     int   oscPort;
 
@@ -538,7 +556,11 @@ private:
 
     char* _getState() const
     {
+        if (!master)
+            return ::strdup("");
+
         const MiddleWareThread::ScopedStopper mwss(*middlewareThread);
+        const MutexLocker cml(mutex);
 
         char* data = nullptr;
         master->getalldata(&data);
@@ -586,10 +608,24 @@ private:
 
    /* -------------------------------------------------------------------------------------------------------- */
 
-    void _uiCallback(const char* const)
+    void _uiCallback(const char* const msg)
     {
-        // this can be used to receive messages from UI
-        // to be handled soon for parameters
+        // Zyn-Fusion publishes the current value of a learned automation
+        // slot as /automate/slotN/value. Reflect it into the host so the
+        // VST3 parameter lane follows UI edits as well as host edits.
+        if (!msg || std::strncmp(msg, "/automate/slot", 14) != 0)
+            return;
+
+        char* end = nullptr;
+        const long slot = std::strtol(msg + 14, &end, 10);
+        if (end == msg + 14 || slot < 0 || slot >= 16 ||
+            std::strncmp(end, "/value", 6) != 0 ||
+            rtosc_narguments(msg) < 1 ||
+            std::strcmp(rtosc_argument_string(msg), "f") != 0)
+            return;
+
+        const float value = std::clamp(rtosc_argument(msg, 0).f, 0.0f, 1.0f);
+        requestParameterValueChange(static_cast<uint32_t>(kParamSlot1 + slot), value);
     }
 
     static void __uiCallback(void* ptr, const char* msg)

@@ -7,3 +7,6 @@
 [submodule "DPF"]
 	path = DPF
 	url = https://github.com/DISTRHO/DPF
+[submodule "zyn-fusion-ui"]
+	path = zyn-fusion-ui
+	url = https://github.com/mruby-zest/mruby-zest-build.git
