@@ -17,6 +17,15 @@ build
 build-vst3/
 build-vst3-win/
 dist/
+**/build/
+**/package/
+*.a
+*.dll
+*.exe
+*.so
+*.tar.bz2
+zyn-fusion-ui/mruby/bin/
+zyn-fusion-ui/zest
 doc/gen/
 doc/zynaddsubfx.html
 doc/zynaddsubfx.pdf

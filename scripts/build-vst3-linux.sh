@@ -17,7 +17,7 @@ fi
 
 fusion_dir="$root_dir/zyn-fusion-ui"
 if [[ ! -d "$fusion_dir" ]]; then
-    echo "zyn-fusion-ui submodule is missing" >&2
+    echo "bundled zyn-fusion-ui directory is missing" >&2
     exit 1
 fi
 

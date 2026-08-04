@@ -10,7 +10,7 @@ archive=${WINDOWS_ARCHIVE:-"$dist_dir/ZynAddSubFX-windows-x86_64.zip"}
 fusion_dir="$root_dir/zyn-fusion-ui"
 
 if [[ ! -d "$fusion_dir" ]]; then
-    echo "zyn-fusion-ui submodule is missing" >&2
+    echo "bundled zyn-fusion-ui directory is missing" >&2
     exit 1
 fi
 if [[ ! -f "$deps_prefix/include/fftw3.h" || ! -f "$deps_prefix/lib/libfftw3f.a" ]]; then
