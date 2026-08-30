@@ -1,10 +1,46 @@
-image::https://travis-ci.org/zynaddsubfx/zynaddsubfx.svg?branch=master[alt="Build status", link="https://travis-ci.org/zynaddsubfx/zynaddsubfx"]
-
-ZynAddSubFX
------------
+ZynAddSubFX VST3
+----------------
 
 ZynAddSubFX is a fully featured musical software synthesizer for Linux, MacOS, BSD, and Windows.
-ZynAddSubFX exposes a wide array of synthesis parameters to make it flexible tool for sound design and a fun experience for playing instruments.
+ZynAddSubFX exposes a wide array of synthesis parameters, making it a flexible tool for sound design and a fun instrument to play.
+
+This repository is a VST3-focused, cross-platform fork of ZynAddSubFX. It adds a
+DPF-based VST3 instrument with an embedded Zyn-Fusion editor for Linux and
+Windows. The plugin bundle includes the editor runtime, UI assets, factory
+banks, and license files, so it does not depend on the source tree or a system
+Zyn-Fusion installation at runtime.
+
+The source is organized as a monorepo. DPF, RtOsc, TLSF, and Zyn-Fusion are
+checked in alongside the synth instead of being fetched as Git submodules. The
+portability work also moves the core to C++20 and replaces several POSIX-only
+APIs with their standard C++ equivalents.
+
+Building the VST3
+~~~~~~~~~~~~~~~~~
+
+Build the Linux VST3 bundle with:
+
+[source,sh]
+----
+./scripts/build-vst3-linux.sh
+----
+
+The result is `build-vst3/bin/ZynAddSubFX.vst3`.
+
+From a Linux MinGW-w64 environment with the required cross-compiled libraries,
+build and package the Windows VST3 with:
+
+[source,sh]
+----
+./scripts/build-vst3-windows.sh
+----
+
+The result is `dist/ZynAddSubFX-windows-x86_64.zip`. See the
+link:docs/VST3.md[VST3 build guide] for build customization, resource packaging,
+and Windows installation details.
+
+The focused build scripts disable the legacy LV2 and VST2 targets. They can be
+enabled in a custom CMake build with `-DLegacyPluginFormats=ON`.
 
 image::doc/zyn-fusion-add.png[Zyn-Fusion Add Synth Editor]
 
@@ -28,7 +64,7 @@ Features
 **      Per-note controller events via MIDI SysEx. Allows individual active notes to receive MIDI control events.
 **      Per-note pitch bend events via MIDI SysEx. Allows individual active notes to change pitch.
 *   Session Management Support via LASH/NSM.
-*   Plugin Support via DSSI/LV2/VST.
+*   Plugin support, with VST3 as the primary target in this repository and legacy DSSI/LV2/VST2 builds available optionally.
 *   Over 1100 high quality instruments included.
 
 
@@ -42,8 +78,14 @@ For more information see:
 Dependencies
 ~~~~~~~~~~~~
 
-ZynAddSubFX depends on a number of dependencies for building.
-For more information on building the core along with the FLTK based interface see doc/building.txt and for building the new interface see https://github.com/zynaddsubfx/zyn-fusion-build.
+Clone this repository normally; no submodule initialization is required. The
+VST3 build uses the bundled DPF, RtOsc, TLSF, and Zyn-Fusion source trees.
+
+Building requires a C++20 compiler, CMake 3.10 or newer, and the usual platform
+build tools. The Zyn-Fusion runtime also uses Ruby and Rake during its build.
+For the focused plugin build, use the scripts above and refer to
+link:docs/VST3.md[docs/VST3.md]. For the standalone synth and legacy interfaces,
+see link:doc/build.txt[doc/build.txt].
 
 Required:
 
@@ -62,11 +104,19 @@ Optional:
 - LASH
 - DSSI
 
+Bundled:
+
+- DPF           - plugin framework and VST3 implementation
+- RtOsc         - realtime Open Sound Control
+- TLSF          - realtime memory allocator
+- Zyn-Fusion UI - embedded plugin editor
+
 Sibling projects
 ~~~~~~~~~~~~~~~~
 
-- rtosc       - realtime open sound control https://github.com/fundamental/rtosc
-- mruby-zest  - the framework for the zyn-fusion GUI https://github.com/mruby-zest/mruby-zest
+- ZynAddSubFX   - upstream synthesizer https://github.com/zynaddsubfx/zynaddsubfx
+- RtOsc         - realtime Open Sound Control https://github.com/fundamental/rtosc
+- mruby-zest    - framework used by the Zyn-Fusion GUI https://github.com/mruby-zest/mruby-zest
 
 
 License
