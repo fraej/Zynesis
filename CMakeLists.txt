@@ -1,11 +1,11 @@
 cmake_minimum_required(VERSION 3.13)
-project(zynaddsubfx)
+project(zynth)
 set(VERSION_MAJOR "3")
 set(VERSION_MINOR "0")
 set(VERSION_REVISION "7")
 cmake_policy(SET CMP0072 NEW)
 
-# DPF provides the VST3 wrapper and the OpenGL editor host.  Keep its own
+# DPF provides the VST3 and CLAP wrappers and the OpenGL editor host.  Keep its own
 # examples and libraries out; the plugin target creates what it needs.
 set(DPF_LIBRARIES OFF CACHE BOOL "Build DPF libraries" FORCE)
 set(DPF_EXAMPLES OFF CACHE BOOL "Build DPF examples" FORCE)

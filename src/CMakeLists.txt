@@ -102,7 +102,7 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR})
 link_directories(${FFTW3F_LIBRARY_DIRS} ${MXML_LIBRARY_DIRS} ${LIBLO_LIBRARY_DIRS})
 
-add_library(zynaddsubfx_core STATIC
+add_library(zynth_core STATIC
     version.cpp
     globals.cpp
     ../tlsf/tlsf.c
@@ -146,6 +146,7 @@ add_library(zynaddsubfx_core STATIC
     Misc/Part.cpp
     Misc/PresetExtractor.cpp
     Misc/Recorder.cpp
+    Misc/ResourceDirs.cpp
     Misc/Schema.cpp
     Misc/Util.cpp
     Misc/WavFile.cpp
@@ -175,17 +176,18 @@ add_library(zynaddsubfx_core STATIC
     Synth/WatchPoint.cpp
     UI/ConnectionDummy.cpp)
 
-target_link_libraries(zynaddsubfx_core PUBLIC
+target_link_libraries(zynth_core PUBLIC
     ${ZLIB_LIBRARIES}
     ${FFTW3F_LIBRARIES}
     ${MXML_LIBRARIES}
     ${LIBLO_LIBRARIES}
     ${PTHREAD_LIBRARY}
+    ${CMAKE_DL_LIBS}
     rtosc
     rtosc-cpp)
 
 if(Werror)
-    target_compile_options(zynaddsubfx_core PRIVATE -Werror)
+    target_compile_options(zynth_core PRIVATE -Werror)
 endif()
 
 add_subdirectory(Plugin)

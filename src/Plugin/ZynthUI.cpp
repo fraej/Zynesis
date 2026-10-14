@@ -1,7 +1,7 @@
 /*
-  ZynAddSubFX - a software synthesizer
+  Zynth - a synthesizer plugin based on ZynAddSubFX
 
-  ZynAddSubFX-UI.cpp - DPF + ZynAddSubFX External UI
+  ZynthUI.cpp - DPF editor hosting the Zyn-Fusion UI (libzest)
   Copyright (C) 2015-2016 Filipe Coelho
   Author: Filipe Coelho
 
@@ -11,35 +11,23 @@
   of the License, or (at your option) any later version.
 */
 
-#if !defined(WIN32) && !defined(__APPLE__)
-#include <string>
 #include <cstdio>
-#include <unistd.h>
+#include <filesystem>
+#include <string>
+#include <vector>
+
 #include "zyn-config.h"
-#endif
+#include "Misc/ResourceDirs.h"
 
 // DPF includes
 #include "DistrhoUI.hpp"
-#include "DistrhoPluginUtils.hpp"
 #ifdef WIN32
 #include <windows.h>
+#define ZEST_LIBRARY "libzest.dll"
 #else
-#ifndef __USE_GNU
-#define __USE_GNU
-#endif
 #include <dlfcn.h>
+#define ZEST_LIBRARY "libzest.so"
 #endif
-
- #ifdef WIN32
-static HMODULE get_zyn_module()
-{
-    HMODULE module = nullptr;
-    GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
-                           GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
-                       reinterpret_cast<LPCSTR>(&get_zyn_module), &module);
-    return module;
-}
- #endif
 
 typedef void *zest_t;
 struct zest_handles {
@@ -59,72 +47,39 @@ struct zest_handles {
 };
 
 /* ------------------------------------------------------------------------------------------------------------
- * ZynAddSubFX UI class */
+ * Zynth UI class */
 
-class ZynAddSubFXUI : public UI
+class ZynthUI : public UI
 {
 public:
-    ZynAddSubFXUI()
+    ZynthUI()
         : UI(1181, 659)
     {
-        printf("[INFO] Opened the zynaddsubfx UI...\n");
+        printf("[INFO] Opened the Zynth UI...\n");
+        // The Zyn-Fusion runtime ships with the plugin (see ResourceDirs.h);
+        // the ZynFusionDir CMake option points at a development build.
+        std::vector<std::string> dirs = zyn::bundledResourceDirs();
+        if(*zyn::fusion_dir)
+            dirs.push_back(zyn::fusion_dir);
+        for(const std::string &dir : dirs) {
+            const std::filesystem::path path =
+                std::filesystem::path(dir) / ZEST_LIBRARY;
+            std::error_code ec;
+            if(!std::filesystem::exists(path, ec))
+                continue;
+            printf("[INFO] Loading zest library from <%s>\n", path.string().c_str());
 #ifdef WIN32
-        char path[1024];
-        GetModuleFileNameA(get_zyn_module(), path, sizeof(path));
-        char *last_separator = strrchr(path, '\\');
-        if (last_separator)
-            last_separator[1] = 0;
-        strcat(path, "libzest.dll");
-        printf("[DEBUG] Loading zest library from <%s>\n", path);
-        handle = LoadLibrary(path);
-        if(!handle)
-            handle = LoadLibrary("./libzest.dll");
-        if(!handle)
-            handle = LoadLibrary("libzest.dll");
-#elif defined __APPLE__
-        handle = dlopen("@loader_path/libzest.dylib", RTLD_NOW | RTLD_LOCAL);
-        if(!handle) // VST
-            handle = dlopen("@loader_path/../Resources/libzest.dylib", RTLD_LAZY);
+            handle = LoadLibraryA(path.string().c_str());
 #else
-        // A VST3 editor is loaded from the component bundle.  Resolve the
-        // Zest runtime from Contents/Resources first so hosts do not depend
-        // on their current working directory or a system installation.
-        if (getBundlePath())
-        {
-            const char* const resources = getResourcePath(getBundlePath());
-            if (resources && *resources)
-            {
-                std::string bundled = resources;
-                bundled += "/libzest.so";
-                if (access(bundled.c_str(), R_OK) == 0)
-                    handle = dlopen(bundled.c_str(), RTLD_NOW | RTLD_LOCAL);
-            }
-        }
-        if(zyn::fusion_dir && *zyn::fusion_dir)
-        {
-            std::string fusion = zyn::fusion_dir;
-            fusion += "/libzest.so";
-            if(access(fusion.c_str(), R_OK))
-                fputs("Warning: CMake's ZynFusionDir does not contain a"
-                      "\"libzest.so\" library - ignoring.", stderr);
-            else
-                handle = dlopen(fusion.c_str(), RTLD_LAZY);
-        }
-        if(!handle)
-            handle = dlopen("./libzest.so", RTLD_LAZY);
-        if(!handle)
-            handle = dlopen("/opt/zyn-fusion/libzest.so", RTLD_LAZY);
-        if(!handle)
-            handle = dlopen("libzest.so", RTLD_LAZY);
+            handle = dlopen(path.string().c_str(), RTLD_NOW | RTLD_LOCAL);
 #endif
+            break;
+        }
         if(!handle) {
- #ifdef WIN32
-            printf("[ERROR] Cannot Open libzest.dll\n");
- #else
-            printf("[ERROR] Cannot Open libzest.so\n");
- #endif
+            printf("[ERROR] Cannot open " ZEST_LIBRARY "\n");
 #ifndef WIN32
-            printf("[ERROR] '%s'\n", dlerror());
+            if(const char *error = dlerror())
+                printf("[ERROR] '%s'\n", error);
 #endif
         }
         memset(&z, 0, sizeof(z));
@@ -150,7 +105,7 @@ public:
             if (!z.zest_open || !z.zest_close || !z.zest_setup ||
                 !z.zest_draw || !z.zest_tick || !z.zest_resize)
             {
-                fputs("[ERROR] libzest.so is missing required symbols\n", stderr);
+                fputs("[ERROR] " ZEST_LIBRARY " is missing required symbols\n", stderr);
 #ifdef WIN32
                 FreeLibrary(handle);
 #else
@@ -164,7 +119,7 @@ public:
         printf("[INFO] Ready to run\n");
     }
 
-    ~ZynAddSubFXUI() override
+    ~ZynthUI() override
     {
         printf("[INFO:Zyn] zest_close()\n");
         if(z.zest)
@@ -331,7 +286,7 @@ private:
 #endif
 
 
-    DISTRHO_DECLARE_NON_COPY_CLASS(ZynAddSubFXUI)
+    DISTRHO_DECLARE_NON_COPY_CLASS(ZynthUI)
 };
 
 /* ------------------------------------------------------------------------------------------------------------
@@ -341,7 +296,7 @@ START_NAMESPACE_DISTRHO
 
 UI* createUI()
 {
-    return new ZynAddSubFXUI();
+    return new ZynthUI();
 }
 
 END_NAMESPACE_DISTRHO

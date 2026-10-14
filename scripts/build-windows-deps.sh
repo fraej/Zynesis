@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Cross-compile the static Windows libraries needed by the VST3 build
+# Cross-compile the static Windows libraries needed by the Windows build
 # (FFTW single precision, Mini-XML, zlib and liblo) with MinGW-w64.
 #
 # The result is a prefix with include/ and lib/ that
-# `scripts/build-vst3.sh windows` consumes through WIN_DEPS_PREFIX.
+# `scripts/build.sh windows` consumes through WIN_DEPS_PREFIX.
 set -euo pipefail
 
 root_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)

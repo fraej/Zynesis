@@ -1,7 +1,7 @@
 /*
-  ZynAddSubFX - a software synthesizer
+  Zynth - a synthesizer plugin based on ZynAddSubFX
 
-  ZynAddSubFX.cpp - DPF + ZynAddSubFX Plugin
+  Zynth.cpp - DPF plugin wrapping the ZynAddSubFX synth core
   Copyright (C) 2015-2016 Filipe Coelho
   Author: Filipe Coelho
 
@@ -14,7 +14,7 @@
 // DPF includes
 #include "DistrhoPlugin.hpp"
 
-// ZynAddSubFX includes
+// Synth core includes
 #include "zyn-version.h"
 #include "Misc/Master.h"
 #include "Misc/MiddleWare.h"
@@ -107,12 +107,12 @@ private:
 };
 
 /* ------------------------------------------------------------------------------------------------------------
- * ZynAddSubFX plugin class */
+ * Zynth plugin class */
 
-class ZynAddSubFX : public Plugin
+class Zynth : public Plugin
 {
 public:
-    ZynAddSubFX()
+    Zynth()
         : Plugin(kParamCount, 1, 1), // 1 program, 1 state
           master(nullptr),
           middleware(nullptr),
@@ -143,7 +143,7 @@ public:
         middlewareThread->start(middleware);
     }
 
-    ~ZynAddSubFX() override
+    ~Zynth() override
     {
         middlewareThread->stop();
         _deleteMaster();
@@ -159,7 +159,7 @@ protected:
     */
     const char* getLabel() const noexcept override
     {
-        return "ZynAddSubFX";
+        return "Zynth";
     }
 
    /**
@@ -167,9 +167,10 @@ protected:
     */
     const char* getDescription() const noexcept override
     {
-        return "Synthesizer featuring additive, subtractive, and Fourier "
-               "synthesis methods, a variety of modulators, powerful "
-               "oscillator editors, and a variety of built-in effects.";
+        return "Synthesizer based on ZynAddSubFX, featuring additive, "
+               "subtractive, and Fourier synthesis methods, a variety of "
+               "modulators, powerful oscillator editors, and a variety of "
+               "built-in effects.";
     }
 
    /**
@@ -177,7 +178,7 @@ protected:
     */
     const char* getMaker() const noexcept override
     {
-        return "ZynAddSubFX Team";
+        return "Zynth";
     }
 
    /**
@@ -186,7 +187,7 @@ protected:
     */
     const char* getHomePage() const noexcept override
     {
-        return "http://zynaddsubfx.sourceforge.net";
+        return "https://github.com/fraej/zyn-vst3";
     }
 
    /**
@@ -194,7 +195,7 @@ protected:
     */
     const char* getLicense() const noexcept override
     {
-        return "GPL v2";
+        return "GPL-2.0-or-later";
     }
 
    /**
@@ -205,15 +206,6 @@ protected:
         return d_version(zyn::version.get_major(),
                          zyn::version.get_minor(),
                          zyn::version.get_revision());
-    }
-
-   /**
-      Get the plugin unique Id.
-      This value is used by LADSPA, DSSI and VST plugin formats.
-    */
-    int64_t getUniqueId() const noexcept override
-    {
-        return d_cconst('Z', 'A', 'S', 'F');
     }
 
    /* --------------------------------------------------------------------------------------------------------
@@ -593,7 +585,7 @@ private:
     }
 
    /* --------------------------------------------------------------------------------------------------------
-    * ZynAddSubFX Callbacks */
+    * Synth core callbacks */
 
     void _masterChangedCallback(zyn::Master* m)
     {
@@ -603,7 +595,7 @@ private:
 
     static void __masterChangedCallback(void* ptr, zyn::Master* m)
     {
-        ((ZynAddSubFX*)ptr)->_masterChangedCallback(m);
+        ((Zynth*)ptr)->_masterChangedCallback(m);
     }
 
    /* -------------------------------------------------------------------------------------------------------- */
@@ -630,7 +622,7 @@ private:
 
     static void __uiCallback(void* ptr, const char* msg)
     {
-        ((ZynAddSubFX*)ptr)->_uiCallback(msg);
+        ((Zynth*)ptr)->_uiCallback(msg);
     }
 
    /* -------------------------------------------------------------------------------------------------------- */
@@ -643,10 +635,10 @@ private:
 
     static void __idleCallback(void* ptr)
     {
-        ((ZynAddSubFX*)ptr)->_idleCallback();
+        ((Zynth*)ptr)->_idleCallback();
     }
 
-    DISTRHO_DECLARE_NON_COPY_CLASS(ZynAddSubFX)
+    DISTRHO_DECLARE_NON_COPY_CLASS(Zynth)
 };
 
 /* ------------------------------------------------------------------------------------------------------------
@@ -657,7 +649,7 @@ START_NAMESPACE_DISTRHO
 Plugin* createPlugin()
 {
     zyn::isPlugin = true;
-    return new ZynAddSubFX();
+    return new Zynth();
 }
 
 END_NAMESPACE_DISTRHO

@@ -1,8 +1,8 @@
 = Zyn-Fusion User Interface
 
-The Zyn-Fusion editor runtime (libzest), built on mruby-zest. The VST3 plugin
-loads it to draw its editor; `scripts/build-vst3.sh` builds it through this
-directory's Makefile.
+The Zyn-Fusion editor runtime (libzest), built on mruby-zest. The Zynth
+plugins load it to draw their editor; `scripts/build.sh` builds it through
+this directory's Makefile.
 
 [source,bash]
 ----

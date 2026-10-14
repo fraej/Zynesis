@@ -16,7 +16,7 @@ jobs:
         run: yamllint $(git ls-files '*.yml' ':!:DPF' ':!:rtosc' ':!:zyn-fusion-ui')
 
   linux:
-    name: Linux (tests and VST3)
+    name: Linux (tests and plugins)
     runs-on: ubuntu-24.04
     steps:
       - name: Check out
@@ -34,16 +34,16 @@ jobs:
           cmake -S . -B build-tests
           cmake --build build-tests --parallel
           ctest --test-dir build-tests --output-on-failure
-      - name: Build the VST3
-        run: ./scripts/build-vst3.sh linux
-      - name: Upload the bundle
+      - name: Build the plugins
+        run: ./scripts/build.sh linux
+      - name: Upload the plugins
         uses: actions/upload-artifact@v4
         with:
-          name: ZynAddSubFX-linux-x86_64
-          path: dist/linux/ZynAddSubFX.vst3
+          name: Zynth-linux-x86_64
+          path: dist/linux
 
   windows:
-    name: Windows VST3 (MinGW-w64 cross-build)
+    name: Windows plugins (MinGW-w64 cross-build)
     runs-on: ubuntu-24.04
     steps:
       - name: Check out
@@ -60,10 +60,10 @@ jobs:
         with:
           path: build-win-deps/prefix
           key: win-deps-${{ hashFiles('scripts/build-windows-deps.sh') }}
-      - name: Build the VST3
-        run: ./scripts/build-vst3.sh windows
-      - name: Upload the bundle
+      - name: Build the plugins
+        run: ./scripts/build.sh windows
+      - name: Upload the plugins
         uses: actions/upload-artifact@v4
         with:
-          name: ZynAddSubFX-windows-x86_64
-          path: dist/windows/ZynAddSubFX.vst3
+          name: Zynth-windows-x86_64
+          path: dist/windows
