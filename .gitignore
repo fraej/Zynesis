@@ -5,34 +5,16 @@
 *~
 *.swp
 .DS_Store
-/*.config
-/*.creator
-/*.creator.user
-/*.files
-/*.includes
 
-# Build directories and release packages
+# Build directories and packages
 /build*/
 /dist/
-/*.tar.bz2
 CMakeCache.txt
 CMakeFiles/
 
-# In-tree build outputs of the synth and its documentation
-*.o
-*.bc
-/src/zynaddsubfx
-/src/Tests/runner
-/src/Tests/runner.cpp
-/src/Tests/Testing
-/doc/gen/
-/doc/zynaddsubfx.html
-/doc/zynaddsubfx.pdf
-/doc/zynaddsubfx.1
-/doc/zynaddsubfx.chunked
-
 # Zyn-Fusion is built in-tree by zyn-fusion-ui/Makefile; see also
 # zyn-fusion-ui/.gitignore
+*.o
 /zyn-fusion-ui/libzest.dll
 /zyn-fusion-ui/zest.exe
 /zyn-fusion-ui/deps/libuv-win.a

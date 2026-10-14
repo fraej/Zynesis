@@ -18,8 +18,8 @@ for tool in "$host-gcc" "$host-g++" "$host-ar" cmake ninja ruby rake zip; do
     fi
 done
 
-if [[ ! -f "$deps_prefix/lib/libfftw3f.a" || ! -f "$deps_prefix/lib/libmxml.a" ||
-      ! -f "$deps_prefix/lib/libz.a" || ! -f "$deps_prefix/lib/liblo.a" ]]; then
+if [[ ! -f "$deps_prefix/lib/libz.a" || ! -f "$deps_prefix/lib/libfftw3f.a" ||
+      ! -f "$deps_prefix/lib/pkgconfig/mxml.pc" || ! -f "$deps_prefix/lib/liblo.a" ]]; then
     WIN_DEPS_PREFIX="$deps_prefix" "$root_dir/scripts/build-windows-deps.sh"
 fi
 
@@ -34,10 +34,7 @@ fi
 cmake -S "$root_dir" -B "$build_dir" -G Ninja \
     -DCMAKE_TOOLCHAIN_FILE="$root_dir/cmake/mingw-w64-x86_64.cmake" \
     -DZYN_WIN_DEPS_PREFIX="$deps_prefix" \
-    -DGuiModule=zest -DPluginEnable=ON -DVst3Enable=ON \
-    -DLegacyPluginFormats=OFF -DCompileTests=OFF -DWerror=OFF \
-    -DAlsaEnable=OFF -DJackEnable=OFF -DOssEnable=OFF -DSndioEnable=OFF \
-    -DPaEnable=OFF -DLashEnable=OFF
+    -DCompileTests=OFF -DWerror=OFF
 cmake --build "$build_dir" --target ZynAddSubFX-vst3 --parallel
 
 source_bundle="$build_dir/bin/ZynAddSubFX.vst3"
@@ -59,7 +56,7 @@ cp "$fusion_dir"/src/mruby-zest/qml/* "$fusion_dir"/src/mruby-zest/example/* "$a
 cp "$fusion_dir/src/osc-bridge/schema/test.json" "$arch_dir/schema/"
 cp "$fusion_dir"/deps/nanovg/example/*.ttf "$arch_dir/font/"
 
-cp -a "$root_dir/instruments/banks" "$resources/banks"
+cp -a "$root_dir/banks" "$resources/banks"
 
 cp "$root_dir/COPYING" "$resources/licenses/zynaddsubfx-GPL-2.0.txt"
 cp "$fusion_dir/LICENSE" "$resources/licenses/zyn-fusion-LGPL-2.1.txt"

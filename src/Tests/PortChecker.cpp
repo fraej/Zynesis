@@ -12,11 +12,9 @@
 
 #include "../Misc/Master.h"
 #include "../Misc/MiddleWare.h"
-#include "../UI/NSM.H"
 #include "rtosc/arg-val.h"
 
 // for linking purposes only:
-NSM_Client *nsm = 0;
 zyn::MiddleWare *middleware = 0;
 
 char *instance_name=(char*)"";

@@ -43,7 +43,7 @@ customization, resource packaging, and Windows installation details.
 The focused build scripts disable the legacy LV2 and VST2 targets. They can be
 enabled in a custom CMake build with `-DLegacyPluginFormats=ON`.
 
-image::doc/zyn-fusion-add.png[Zyn-Fusion Add Synth Editor]
+image::docs/zyn-fusion-add.png[Zyn-Fusion Add Synth Editor]
 
 Features
 ~~~~~~~~

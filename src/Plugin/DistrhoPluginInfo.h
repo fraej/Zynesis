@@ -18,22 +18,11 @@
 #define DISTRHO_PLUGIN_NAME  "ZynAddSubFX"
 #define DISTRHO_PLUGIN_URI   "http://zynaddsubfx.sourceforge.net"
 
-#if defined(NTK_GUI)
- #define DISTRHO_PLUGIN_HAS_UI          1
- #define DISTRHO_PLUGIN_HAS_EMBED_UI    1
- #define DISTRHO_PLUGIN_HAS_EXTERNAL_UI 1
-#elif defined(FLTK_GUI)
- #define DISTRHO_PLUGIN_HAS_UI          1
- #define DISTRHO_PLUGIN_HAS_EMBED_UI    0
- #define DISTRHO_PLUGIN_HAS_EXTERNAL_UI 1
-#elif defined(ZEST_GUI)
- #define DGL_OPENGL                     1
- #define HAVE_OPENGL                    1
- #define DISTRHO_PLUGIN_HAS_UI          1
- #define DISTRHO_PLUGIN_HAS_EMBED_UI    1
-#else
- #define DISTRHO_PLUGIN_HAS_UI          0
-#endif
+// The embedded editor is an OpenGL view that hosts Zyn-Fusion (libzest).
+#define DGL_OPENGL                      1
+#define HAVE_OPENGL                     1
+#define DISTRHO_PLUGIN_HAS_UI           1
+#define DISTRHO_PLUGIN_HAS_EMBED_UI     1
 
 #define DISTRHO_PLUGIN_IS_RT_SAFE       1
 #define DISTRHO_PLUGIN_IS_SYNTH         1

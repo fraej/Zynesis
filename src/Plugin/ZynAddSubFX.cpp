@@ -661,24 +661,3 @@ Plugin* createPlugin()
 }
 
 END_NAMESPACE_DISTRHO
-
-/* ------------------------------------------------------------------------------------------------------------
- * Dummy variables and functions for linking purposes */
-
-namespace zyn {
-class WavFile;
-namespace Nio {
-   void masterSwap(zyn::Master*){}
-   bool setSource(std::string){return true;}
-   bool setSink(std::string){return true;}
-   std::set<std::string> getSources(void){return std::set<std::string>();}
-   std::set<std::string> getSinks(void){return std::set<std::string>();}
-   std::string getSource(void){return "";}
-   std::string getSink(void){return "";}
-   void waveNew(WavFile*){}
-   void waveStart(){}
-   void waveStop(){}
-   void setAudioCompressor(bool){}
-   bool getAudioCompressor(void){return false;}
-}
-}

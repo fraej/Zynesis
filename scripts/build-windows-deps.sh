@@ -86,7 +86,7 @@ if [[ ! -f "$prefix/lib/libfftw3f.a" ]]; then
     install_licenses fftw COPYING
 fi
 
-if [[ ! -f "$prefix/lib/libmxml.a" ]]; then
+if [[ ! -f "$prefix/lib/pkgconfig/mxml.pc" ]]; then
     fetch mxml "$mxml_url" "$mxml_sha256"
     (
         cd "$src_dir/mxml"
@@ -98,6 +98,7 @@ if [[ ! -f "$prefix/lib/libmxml.a" ]]; then
         make -j"$jobs" libmxml.a
         install -D -m 644 libmxml.a "$prefix/lib/libmxml.a"
         install -D -m 644 mxml.h "$prefix/include/mxml.h"
+        install -D -m 644 mxml.pc "$prefix/lib/pkgconfig/mxml.pc"
     )
     install_licenses mxml LICENSE NOTICE
 fi

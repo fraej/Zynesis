@@ -15,8 +15,7 @@ if [[ ! -f "$fusion_dir/package/libzest.so" ]]; then
 fi
 
 cmake -S "$root_dir" -B "$build_dir" -G "${CMAKE_GENERATOR:-Unix Makefiles}" \
-    -DGuiModule=zest -DPluginEnable=ON -DVst3Enable=ON \
-    -DLegacyPluginFormats=OFF -DCompileTests=OFF -DWerror=OFF
+    -DCompileTests=OFF -DWerror=OFF
 cmake --build "$build_dir" --target ZynAddSubFX-vst3 --parallel
 
 bundle="$build_dir/bin/ZynAddSubFX.vst3"
@@ -28,7 +27,7 @@ for dir in font qml schema; do
     cp -a "$fusion_dir/package/$dir" "$resources/$dir"
 done
 rm -rf "$resources/banks"
-cp -a "$root_dir/instruments/banks" "$resources/banks"
+cp -a "$root_dir/banks" "$resources/banks"
 mkdir -p "$resources/licenses"
 cp "$root_dir/COPYING" "$resources/licenses/zynaddsubfx-GPL-2.0.txt"
 cp "$fusion_dir/LICENSE" "$resources/licenses/zyn-fusion-LGPL-2.1.txt"
