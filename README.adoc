@@ -27,17 +27,18 @@ Build the Linux VST3 bundle with:
 
 The result is `build-vst3/bin/ZynAddSubFX.vst3`.
 
-From a Linux MinGW-w64 environment with the required cross-compiled libraries,
-build and package the Windows VST3 with:
+Cross-compile and package the Windows VST3 from Linux with MinGW-w64:
 
 [source,sh]
 ----
 ./scripts/build-vst3-windows.sh
 ----
 
-The result is `dist/ZynAddSubFX-windows-x86_64.zip`. See the
-link:docs/VST3.md[VST3 build guide] for build customization, resource packaging,
-and Windows installation details.
+On first use the script also cross-compiles the static Windows dependencies
+(FFTW, Mini-XML, zlib, and liblo). The result is
+`dist/ZynAddSubFX-windows-x86_64.zip`. See the
+link:docs/VST3.md[VST3 build guide] for the required packages, build
+customization, resource packaging, and Windows installation details.
 
 The focused build scripts disable the legacy LV2 and VST2 targets. They can be
 enabled in a custom CMake build with `-DLegacyPluginFormats=ON`.
@@ -82,7 +83,8 @@ Clone this repository normally; no submodule initialization is required. The
 VST3 build uses the bundled DPF, RtOsc, TLSF, and Zyn-Fusion source trees.
 
 Building requires a C++20 compiler, CMake 3.10 or newer, and the usual platform
-build tools. The Zyn-Fusion runtime also uses Ruby and Rake during its build.
+build tools. The Zyn-Fusion runtime also uses Ruby and Rake during its build,
+and libuv on Linux.
 For the focused plugin build, use the scripts above and refer to
 link:docs/VST3.md[docs/VST3.md]. For the standalone synth and legacy interfaces,
 see link:doc/build.txt[doc/build.txt].
