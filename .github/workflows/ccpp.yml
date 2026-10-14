@@ -39,7 +39,7 @@ jobs:
             os: ubuntu-latest,
             update: "sudo apt-get update",
             deps1: "sudo apt-get install zlib1g-dev libmxml-dev libfftw3-dev dssi-dev libfltk1.3-dev fluid libxpm-dev fltk1.3",
-            deps2: "sudo apt-get install liblo-dev",
+            deps2: "sudo apt-get install liblo-dev libgl-dev libopengl-dev libx11-dev",
             testdeps: "sudo apt-get install ruby",
             info: "cmake --version && gcc --version",
             config: "cd build && cmake -DRTOSC_WERROR=ON -DWerror=ON -DGuiModule=fltk ..",
@@ -55,7 +55,7 @@ jobs:
             os: ubuntu-latest,
             update: "sudo apt-get update",
             deps1: "sudo apt-get install zlib1g-dev libmxml-dev libfftw3-dev dssi-dev libfltk1.3-dev fluid libxpm-dev fltk1.3",
-            deps2: "sudo apt-get install liblo-dev",
+            deps2: "sudo apt-get install liblo-dev libgl-dev libopengl-dev libx11-dev",
             testdeps: "sudo apt-get install ruby",
             info: "cmake --version && clang --version",
             # the only really different line to gcc:
@@ -113,9 +113,6 @@ jobs:
       - name: install_test_deps1
         if: ${{ matrix.config.enabled == 1 }}
         run: ${{ matrix.config.testdeps }}
-      - name: submodule
-        if: ${{ matrix.config.enabled == 1 }}
-        run: git submodule update --init --recursive
       - name: info
         if: ${{ matrix.config.enabled == 1 }}
         run: ${{ matrix.config.info }}

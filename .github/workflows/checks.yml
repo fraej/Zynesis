@@ -10,5 +10,9 @@ jobs:
     steps:
       - name: Check out
         uses: actions/checkout@v4
+      # DPF, RtOsc and Zyn-Fusion are vendored upstream trees.
       - name: Run yamllint
-        run: for i in $(git ls-files '*.yml'); do yamllint $i; done
+        run: |
+          for i in $(git ls-files '*.yml' ':!:DPF' ':!:rtosc' ':!:zyn-fusion-ui'); do
+            yamllint $i
+          done
