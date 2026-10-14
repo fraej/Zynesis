@@ -16,7 +16,7 @@
 
 #define DISTRHO_PLUGIN_BRAND    "Zynesis"
 #define DISTRHO_PLUGIN_NAME     "Zynesis"
-#define DISTRHO_PLUGIN_URI      "https://github.com/fraej/zyn-vst3"
+#define DISTRHO_PLUGIN_URI      "https://github.com/fraej/Zynesis"
 #define DISTRHO_PLUGIN_CLAP_ID  "io.github.fraej.zynesis"
 
 // Plugin identity: distinct from upstream ZynAddSubFX ('ZASF') so both can

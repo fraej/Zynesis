@@ -187,7 +187,7 @@ protected:
     */
     const char* getHomePage() const noexcept override
     {
-        return "https://github.com/fraej/zyn-vst3";
+        return "https://github.com/fraej/Zynesis";
     }
 
    /**
