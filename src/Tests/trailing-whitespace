@@ -10,7 +10,10 @@ then
 	exit 1
 fi
 
-for codefile in $(cd "$toplevel" && git ls-files '*.h' '*.cpp')
+# DPF, RtOsc and Zyn-Fusion are vendored upstream trees and are kept as-is.
+vendored=(':!:DPF' ':!:rtosc' ':!:zyn-fusion-ui')
+
+for codefile in $(cd "$toplevel" && git ls-files '*.h' '*.cpp' "${vendored[@]}")
 do
 	if grep -H '[[:space:]]\+$' "$toplevel/$codefile"
 	then
@@ -25,7 +28,7 @@ then
 	echo "in the toplevel dir of your git repo:"
 	echo
 	cat - << 'EOF'
-  for i in $(for codefile in $(git ls-files '*.h' '*.cpp'); do grep -H '[[:space:]]\+$' $codefile; done | cut -d: -f1 | sort -u); do sed 's#[[:space:]]\+$##g' -i $i; done
+  for i in $(for codefile in $(git ls-files '*.h' '*.cpp' ':!:DPF' ':!:rtosc' ':!:zyn-fusion-ui'); do grep -H '[[:space:]]\+$' $codefile; done | cut -d: -f1 | sort -u); do sed 's#[[:space:]]\+$##g' -i $i; done
 EOF
 	echo
 fi

@@ -201,7 +201,9 @@ static const Ports partPorts = {
                 char filename[32];
                 time (&rawtime);
                 const struct tm* timeinfo = localtime (&rawtime);
-                strftime (filename,23,"%F_%R.xiz",timeinfo);
+                // %F/%R are not supported by MSVCRT, and ':' is not
+                // valid in Windows file names.
+                strftime (filename,23,"%Y-%m-%d_%H-%M.xiz",timeinfo);
                 err = p->saveXML(filename);
                 fprintf(stderr, "Part %d saved to %s: %s\n", (p->partno + 1), filename, err ? "failed" : "ok");
             }

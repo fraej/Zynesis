@@ -1,19 +1,11 @@
+# Outputs of `make linux` and `make windows`
+*.o
 build_config.rb.lock
-deps/glpk-4.52.tar.gz
-deps/glpk-4.52/
 deps/libnanovg.a
-deps/librtosc.a
-deps/libuv-v1.9.1.tar.gz
-deps/libuv-v1.9.1/
-deps/libuv.a
-doc/
+deps/libuv-win.a
+libzest.dll
 libzest.so
-mruby.trace
-package/
+mruby/bin/
+mruby/build/
 src/mruby-widget-lib/mrblib/fcache.rb
-zest
-zest-dist-x86.tar.bz2
-zest-dist.tar.bz2
-zest-temporary.mod
-zest-w.txt
-zynaddsubfx-3.0.0.tar.bz2
+src/osc-bridge/libosc-bridge.a

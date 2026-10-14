@@ -23,13 +23,11 @@
 #include "../Misc/PresetExtractor.cpp"
 #include "../Misc/Util.h"
 #include "../globals.h"
-#include "../UI/NSM.H"
 
 using namespace std;
 using namespace zyn;
 
 SYNTH_T *synth;
-NSM_Client *nsm = 0;
 
 char *instance_name=(char*)"";
 MiddleWare *middleware;

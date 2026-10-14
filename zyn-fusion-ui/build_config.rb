@@ -172,36 +172,3 @@ build_type.new(build_name) do |conf|
 
   #conf.gem 'deps/mruby-profiler'
 end
-
-MRuby::Build.new('host-debug') do |conf|
-  # load specific toolchain settings
-  toolchain :gcc
-
-  enable_debug
-
-  if(windows)
-    # Our custom gem list based on 'default' gembox.
-    # Bypass all CLIs here to avoid linker errors on Msys2.
-    conf.gembox "stdlib"
-    conf.gembox "stdlib-ext"
-    conf.gembox "math"
-    conf.gembox "metaprog"
-
-    # Use stdlib-io except mruby-socket (also unnecessary for cross-building debug targets)
-    conf.gem :core => "mruby-io"
-    conf.gem :core => "mruby-print"
-
-  else
-    # include default GEMs
-    conf.gembox 'default'
-  end
-
-  # C compiler settings
-  conf.cc.defines = %w(MRB_ENABLE_DEBUG_HOOK MRUBY_NANOVG_GL2)
-
-  # Generate mruby debugger command (require mruby-eval)
-  # Also bypass it when building for/on Windows
-  if(!windows)
-    conf.gem :core => "mruby-bin-debugger"
-  end
-end

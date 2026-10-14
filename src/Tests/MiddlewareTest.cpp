@@ -22,11 +22,9 @@
 #include "../Misc/PresetExtractor.cpp"
 #include "../Misc/Util.h"
 #include "../globals.h"
-#include "../UI/NSM.H"
 using namespace std;
 using namespace zyn;
 
-NSM_Client *nsm = 0;
 MiddleWare *middleware = 0;
 
 char *instance_name=(char*)"";
@@ -114,7 +112,7 @@ class MiddleWareTest
         void testLoad(void)
         {
             for(int i=0; i<NUM_MIDDLEWARE; ++i) {
-                middleware[i]->transmitMsg("/load-part", "is", 0, (string(SOURCE_DIR) + "/../../instruments/banks/Organ/0037-Church Organ 1.xiz").c_str());
+                middleware[i]->transmitMsg("/load-part", "is", 0, (string(SOURCE_DIR) + "/../../banks/Organ/0037-Church Organ 1.xiz").c_str());
                 middleware[i]->tick();
                 master[i]->GetAudioOutSamples(synth->buffersize, synth->samplerate, outL, outR);
                 middleware[i]->tick();
@@ -125,7 +123,7 @@ class MiddleWareTest
                 master[i]->GetAudioOutSamples(synth->buffersize, synth->samplerate, outL, outR);
                 middleware[i]->tick();
             }
-            //const string fname = string(SOURCE_DIR) + "/../../instruments/banks/Organ/0037-Church Organ 1.xiz";
+            //const string fname = string(SOURCE_DIR) + "/../../banks/Organ/0037-Church Organ 1.xiz";
             //const string fdata = loadfile(fname);
         }
 

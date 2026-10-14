@@ -26,11 +26,9 @@
 #include "../Misc/PresetExtractor.cpp"
 #include "../Misc/Util.h"
 #include "../globals.h"
-#include "../UI/NSM.H"
 using namespace std;
 using namespace zyn;
 
-class NSM_Client *nsm = 0;
 MiddleWare *middleware = 0;
 
 char *instance_name=(char*)"";

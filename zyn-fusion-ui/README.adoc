@@ -1,43 +1,18 @@
 = Zyn-Fusion User Interface
 
-
-Welcome to the source of the Zyn-Fusion user interface.
-
-== Preparations
-
-The dependencies are included in the parent monorepo checkout.
-
-== Building on Linux
-
-Zyn-Fusion depends on libuv and mesa (packages libuv1-dev, mesa-common-dev,
-libgl1-mesa-dev on Debian variants).
-
-To build you'll want to use the Makefile:
-[source,bash]
-----
-make
-----
-and the ahead-of-time qml compiler 'rebuild-fcache.rb'.
-
-=== Building on OS X
-
-In order to make the build work on a recent OSX (at the time of writing, 10.13),
-run the make process as follows:
+The Zyn-Fusion editor runtime (libzest), built on mruby-zest. The Zynesis
+plugins load it to draw their editor; `scripts/build.sh` builds it through
+this directory's Makefile.
 
 [source,bash]
 ----
-OS=Mac make osx
+make linux                      # libzest.so
+CC=x86_64-w64-mingw32-gcc CXX=x86_64-w64-mingw32-g++ \
+AR=x86_64-w64-mingw32-ar make windows   # libzest.dll
 ----
-There will be a number of deprecation warnings, these can be ignored.
 
-The main difference to the Linux build are the linking options (The process links against
-the `OpenGL` and the `AppKit` frameworks.
-
-== Running
-
-The build process will create a `libzest.so` library and the `zest` executable.
-See the link:contributing.adoc[contributing.adoc] document for information about
-running the application and changing it.
+Both targets run the ahead-of-time QML compiler `rebuild-fcache.rb` first.
+The Linux build needs libuv and OpenGL development packages.
 
 Enjoy,
 --Mark McCurry

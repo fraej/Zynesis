@@ -18,35 +18,21 @@ namespace zyn {
 
 class WavFile;
 class Master;
-struct SYNTH_T;
-class oss_devs_t;
 
-/**Interface to Nio Subsystem
+/**Interface to the audio/MIDI I/O subsystem.
  *
- * Should be only externally included header */
+ * The plugin host owns audio and MIDI I/O, so Nio.cpp implements these as
+ * no-ops; they remain because the synth core reports and controls I/O
+ * through them. */
 namespace Nio
 {
-    void init(const SYNTH_T &synth, const oss_devs_t &oss_devs, Master *master);
-    bool start(void);
-    void stop(void);
-
-    void setDefaultSource(std::string name);
-    void setDefaultSink(std::string name);
-
     bool setSource(std::string name);
     bool setSink(std::string name);
 
-    void setPostfix(std::string post);
-    std::string getPostfix(void);
-
     std::set<std::string> getSources(void);
     std::set<std::string> getSinks(void);
-
     std::string getSource(void);
     std::string getSink(void);
-
-    //Get the preferred sample rate from jack (if running)
-    void preferredSampleRate(unsigned &rate);
 
     //Complete Master Swaps to ONLY BE CALLED FROM RT CONTEXT
     void masterSwap(Master *master);
@@ -55,15 +41,9 @@ namespace Nio
     void waveNew(class WavFile *wave);
     void waveStart(void);
     void waveStop(void);
-    void waveEnd(void);
 
     void setAudioCompressor(bool isEnabled);
     bool getAudioCompressor(void);
-
-    extern bool autoConnect;
-    extern bool pidInClientName;
-    extern std::string defaultSource;
-    extern std::string defaultSink;
 };
 
 }

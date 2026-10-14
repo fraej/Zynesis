@@ -14,10 +14,8 @@
 
 #include "../Misc/Master.h"
 #include "../Misc/MiddleWare.h"
-#include "../UI/NSM.H"
 
 // for linking purposes only:
-NSM_Client *nsm = 0;
 zyn::MiddleWare *middleware = 0;
 
 char *instance_name=(char*)"";

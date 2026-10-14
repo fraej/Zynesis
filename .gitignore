@@ -1,34 +1,11 @@
-*.o
+# Editor and OS files
 *~
-*.bc
 *.swp
-*.config
-*.creator
-*.creator.user
-*.files
-*.includes
-src/zynaddsubfx
-src/Tests/runner
-src/Tests/runner.cpp
-src/Tests/Testing
-CMakeCache.txt
-CMakeFiles
-build
-build-vst3/
-build-vst3-win/
-dist/
-**/build/
-**/package/
-*.a
-*.dll
-*.exe
-*.so
-*.tar.bz2
-zyn-fusion-ui/mruby/bin/
-zyn-fusion-ui/zest
-doc/gen/
-doc/zynaddsubfx.html
-doc/zynaddsubfx.pdf
-doc/zynaddsubfx.1
-doc/zynaddsubfx.chunked
 .DS_Store
+
+# Build directories and packages.  Keep these anchored: the vendored trees
+# contain source directories named "build".
+/build*/
+/dist/
+CMakeCache.txt
+CMakeFiles/

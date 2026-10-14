@@ -28,21 +28,7 @@
 #include "Util.h"
 #include "Part.h"
 #include "BankDb.h"
-#ifdef WIN32
-#include <windows.h>
-#endif
-
-#if !defined(WIN32)
-#include <dlfcn.h>
-
-static const char* my_dylib_path () {
-    static Dl_info info;
-    if (dladdr((const void*) &my_dylib_path, &info)) {
-        return info.dli_fname;
-    }
-    return NULL;
-}
-#endif
+#include "ResourceDirs.h"
 
 using namespace std;
 
@@ -372,45 +358,9 @@ void Bank::rescanforbanks()
     for(int i = 0; i < MAX_BANK_ROOT_DIRS; ++i)
         if(!config->cfg.bankRootDirList[i].empty())
             scanrootdir(config->cfg.bankRootDirList[i]);
-#ifdef WIN32
-    {
-        //Search the VST Directory for banks/preset/etc
-        char path[1024];
-        GetModuleFileName(GetModuleHandle("ZynAddSubFX.dll"), path, sizeof(path));
-        if(strstr(path, "ZynAddSubFX.dll")) {
-            strstr(path, "ZynAddSubFX.dll")[0] = 0;
-            strcat(path, "banks");
-            scanrootdir(path);
-        }
-    }
-#endif
-#if !defined(WIN32)
-   {
-        const char* path = my_dylib_path ();
-        if (path && strlen (path) < 1000) {
-            char tmp[1024];
-            strcpy (tmp, path);
-#ifdef __APPLE__
-            if (strstr(tmp, "ZynAddSubFX.dylib"))
-            {
-                strstr (tmp, "ZynAddSubFX.dylib")[0] = 0; // LV2
-                strcat (tmp, "banks");
-                scanrootdir(tmp);
-                strcpy (tmp, path);
-                strstr (tmp, "ZynAddSubFX.dylib")[0] = 0;
-                strcat (tmp, "../Resources/banks"); // VST
-                scanrootdir(tmp);
-            }
-#else
-            // Linux VST3 modules live in Contents/x86_64-linux while the
-            // bundled instruments live in Contents/Resources/banks.
-            const std::filesystem::path modulePath(path);
-            scanrootdir((modulePath.parent_path() / "../Resources/banks")
-                            .lexically_normal().string());
-#endif
-        }
-   }
-#endif
+    // Factory banks shipped with the plugin.
+    for(const string &dir : bundledResourceDirs())
+        scanrootdir(dir + "/banks");
 
     //sort the banks
     sort(banks.begin(), banks.end());
