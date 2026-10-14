@@ -1,7 +1,7 @@
 /*
-  Zynth - a synthesizer plugin based on ZynAddSubFX
+  Zynesis - a synthesizer plugin based on ZynAddSubFX
 
-  ZynthUI.cpp - DPF editor hosting the Zyn-Fusion UI (libzest)
+  ZynesisUI.cpp - DPF editor hosting the Zyn-Fusion UI (libzest)
   Copyright (C) 2015-2016 Filipe Coelho
   Author: Filipe Coelho
 
@@ -47,15 +47,15 @@ struct zest_handles {
 };
 
 /* ------------------------------------------------------------------------------------------------------------
- * Zynth UI class */
+ * Zynesis UI class */
 
-class ZynthUI : public UI
+class ZynesisUI : public UI
 {
 public:
-    ZynthUI()
+    ZynesisUI()
         : UI(1181, 659)
     {
-        printf("[INFO] Opened the Zynth UI...\n");
+        printf("[INFO] Opened the Zynesis UI...\n");
         // The Zyn-Fusion runtime ships with the plugin (see ResourceDirs.h);
         // the ZynFusionDir CMake option points at a development build.
         std::vector<std::string> dirs = zyn::bundledResourceDirs();
@@ -119,7 +119,7 @@ public:
         printf("[INFO] Ready to run\n");
     }
 
-    ~ZynthUI() override
+    ~ZynesisUI() override
     {
         printf("[INFO:Zyn] zest_close()\n");
         if(z.zest)
@@ -286,7 +286,7 @@ private:
 #endif
 
 
-    DISTRHO_DECLARE_NON_COPY_CLASS(ZynthUI)
+    DISTRHO_DECLARE_NON_COPY_CLASS(ZynesisUI)
 };
 
 /* ------------------------------------------------------------------------------------------------------------
@@ -296,7 +296,7 @@ START_NAMESPACE_DISTRHO
 
 UI* createUI()
 {
-    return new ZynthUI();
+    return new ZynesisUI();
 }
 
 END_NAMESPACE_DISTRHO

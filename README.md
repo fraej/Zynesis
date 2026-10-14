@@ -1,15 +1,15 @@
-# Zynth
+# Zynesis
 
-Zynth is a synthesizer plugin in **VST3** and **CLAP** formats for **Linux**
+Zynesis is a synthesizer plugin in **VST3** and **CLAP** formats for **Linux**
 and **Windows** (x86_64), with the Zyn-Fusion editor built in. macOS (and an
 Audio Unit) may follow some day.
 
-Zynth started as a fork of [ZynAddSubFX](https://github.com/zynaddsubfx/zynaddsubfx)
+Zynesis started as a fork of [ZynAddSubFX](https://github.com/zynaddsubfx/zynaddsubfx)
 and keeps its synthesis engine, but it is now a separate project with its own
 goals: one self-contained plugin for modern hosts. It is not affiliated with
 or endorsed by the ZynAddSubFX project, and it does not build the standalone
-ZynAddSubFX application or its LV2, VST2 and DSSI plugins, which Zynth treats
-as legacy formats. Zynth uses its own plugin IDs, so it installs side by side
+ZynAddSubFX application or its LV2, VST2 and DSSI plugins, which Zynesis treats
+as legacy formats. Zynesis uses its own plugin IDs, so it installs side by side
 with ZynAddSubFX.
 
 ![Zyn-Fusion Add Synth editor](docs/zyn-fusion-add.png)
@@ -24,10 +24,10 @@ layered instruments, microtonal scales, and over 1100 instruments.
 Both platforms build on Linux. `scripts/build.sh <platform>` produces:
 
 ```text
-dist/<platform>/VST3/Zynth.vst3    VST3 bundle
-dist/<platform>/CLAP/Zynth.clap    CLAP plugin
-dist/<platform>/CLAP/Zynth/        resources the CLAP plugin loads (keep it next to Zynth.clap)
-dist/Zynth-<platform>-x86_64.zip   both formats
+dist/<platform>/VST3/Zynesis.vst3    VST3 bundle
+dist/<platform>/CLAP/Zynesis.clap    CLAP plugin
+dist/<platform>/CLAP/Zynesis/        resources the CLAP plugin loads (keep it next to Zynesis.clap)
+dist/Zynesis-<platform>-x86_64.zip   both formats
 ```
 
 Each plugin carries the editor runtime, its assets, the factory banks and the
@@ -82,8 +82,8 @@ The Zyn-Fusion runtime (`libzest`) builds inside `zyn-fusion-ui/`; delete
 
 | Format | Linux | Windows |
 | --- | --- | --- |
-| VST3 | copy `Zynth.vst3` to `~/.vst3/` | copy `Zynth.vst3` to `C:\Program Files\Common Files\VST3\` |
-| CLAP | copy `Zynth.clap` and `Zynth/` to `~/.clap/` | copy `Zynth.clap` and `Zynth\` to `C:\Program Files\Common Files\CLAP\` |
+| VST3 | copy `Zynesis.vst3` to `~/.vst3/` | copy `Zynesis.vst3` to `C:\Program Files\Common Files\VST3\` |
+| CLAP | copy `Zynesis.clap` and `Zynesis/` to `~/.clap/` | copy `Zynesis.clap` and `Zynesis\` to `C:\Program Files\Common Files\CLAP\` |
 
 Then rescan plugins in the DAW.
 
@@ -114,7 +114,7 @@ without their examples, tests and documentation.
 
 ## License
 
-Zynth is free software under the GNU General Public License, version 2 or
+Zynesis is free software under the GNU General Public License, version 2 or
 (at your option) any later version; see `COPYING`. The synthesis engine is
 the work of the ZynAddSubFX authors listed in `AUTHORS.txt`, and source files
 keep their original copyright notices.
@@ -126,9 +126,9 @@ liblo (LGPL-2.1-or-later), Mini-XML (Apache-2.0 with a GPLv2 linking exception)
 and zlib. `THIRD_PARTY.md` lists every component and its license; the packaged
 plugins carry these texts in their `licenses` folder.
 
-When you distribute Zynth binaries, the GPL requires you to make the
+When you distribute Zynesis binaries, the GPL requires you to make the
 corresponding source available, including the sources of the statically
 linked Windows dependencies that `scripts/build-windows-deps.sh` downloads.
 
-VST is a trademark of Steinberg Media Technologies GmbH. Zynth's VST3 support
+VST is a trademark of Steinberg Media Technologies GmbH. Zynesis's VST3 support
 comes from DPF and contains no Steinberg SDK code.

@@ -1,6 +1,6 @@
 # Third-party components
 
-Zynth is distributed under the GNU General Public License, version 2 or
+Zynesis is distributed under the GNU General Public License, version 2 or
 (at your option) any later version (`COPYING`). It contains or links the
 components below. Every license listed is compatible with distributing the
 combined plugin under GPL-2.0-or-later. The packaged plugins carry these
@@ -57,6 +57,6 @@ shared library that the plugin loads at runtime.
 
 ## Trademarks
 
-VST is a trademark of Steinberg Media Technologies GmbH. Zynth uses no
+VST is a trademark of Steinberg Media Technologies GmbH. Zynesis uses no
 Steinberg SDK code; the VST3 interface comes from DPF. Roboto is a trademark
 of Google, and Entypo of Daniel Bruce.

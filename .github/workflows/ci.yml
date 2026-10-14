@@ -39,7 +39,7 @@ jobs:
       - name: Upload the plugins
         uses: actions/upload-artifact@v4
         with:
-          name: Zynth-linux-x86_64
+          name: Zynesis-linux-x86_64
           path: dist/linux
 
   windows:
@@ -65,5 +65,5 @@ jobs:
       - name: Upload the plugins
         uses: actions/upload-artifact@v4
         with:
-          name: Zynth-windows-x86_64
+          name: Zynesis-windows-x86_64
           path: dist/windows

@@ -1,5 +1,5 @@
 /*
-  Zynth - a ZynAddSubFX-based synthesizer plugin
+  Zynesis - a ZynAddSubFX-based synthesizer plugin
 
   ResourceDirs.h - Locate the resources shipped with the plugin binary
 
@@ -21,8 +21,8 @@ namespace zyn {
  * editor runtime and its assets, and the factory banks), derived from the
  * location of the binary that contains this code:
  *
- *   Zynth.vst3/Contents/<arch>/<binary>  ->  Zynth.vst3/Contents/Resources
- *   <dir>/Zynth.clap                     ->  <dir>/Zynth
+ *   Zynesis.vst3/Contents/<arch>/<binary>  ->  Zynesis.vst3/Contents/Resources
+ *   <dir>/Zynesis.clap                     ->  <dir>/Zynesis
  *
  * The directories are not checked for existence.
  */

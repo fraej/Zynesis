@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Build and package the Zynth VST3 and CLAP plugins.
+# Build and package the Zynesis VST3 and CLAP plugins.
 #
 #   scripts/build.sh linux     native Linux x86_64 build
 #   scripts/build.sh windows   Windows x86_64 cross-build with MinGW-w64
 #
 # Output, in dist/<platform>/:
-#   VST3/Zynth.vst3                 VST3 bundle, resources in Contents/Resources
-#   CLAP/Zynth.clap, CLAP/Zynth/    CLAP plugin and its resource folder
-# and dist/Zynth-<platform>-x86_64.zip with both.
+#   VST3/Zynesis.vst3                 VST3 bundle, resources in Contents/Resources
+#   CLAP/Zynesis.clap, CLAP/Zynesis/    CLAP plugin and its resource folder
+# and dist/Zynesis-<platform>-x86_64.zip with both.
 set -euo pipefail
 
 platform=${1:-linux}
@@ -64,7 +64,7 @@ if [[ ! -f "$fusion_dir/$runtime" ]]; then
 fi
 
 cmake -S "$root_dir" -B "$build_dir" "${cmake_args[@]}"
-cmake --build "$build_dir" --target Zynth-vst3 Zynth-clap --parallel
+cmake --build "$build_dir" --target Zynesis-vst3 Zynesis-clap --parallel
 
 # stage_resources DIR: the editor runtime and its assets, the factory banks
 # and the licenses, laid out as the plugin expects (src/Misc/ResourceDirs.h).
@@ -83,7 +83,7 @@ stage_resources() {
     while read -r name src; do
         cp "$root_dir/$src" "$dir/licenses/$name"
     done <<'LICENSES'
-Zynth-GPL-2.0-or-later.txt COPYING
+Zynesis-GPL-2.0-or-later.txt COPYING
 AUTHORS.txt AUTHORS.txt
 THIRD_PARTY.md THIRD_PARTY.md
 DPF-ISC.txt DPF/LICENSE
@@ -122,13 +122,13 @@ out="$dist_dir/$platform"
 rm -rf "$out"
 mkdir -p "$out/VST3" "$out/CLAP"
 
-cp -a "$build_dir/bin/Zynth.vst3" "$out/VST3/"
-stage_resources "$out/VST3/Zynth.vst3/Contents/Resources"
+cp -a "$build_dir/bin/Zynesis.vst3" "$out/VST3/"
+stage_resources "$out/VST3/Zynesis.vst3/Contents/Resources"
 
-cp "$build_dir/bin/Zynth.clap" "$out/CLAP/"
-stage_resources "$out/CLAP/Zynth"
+cp "$build_dir/bin/Zynesis.clap" "$out/CLAP/"
+stage_resources "$out/CLAP/Zynesis"
 
-archive="$dist_dir/Zynth-$platform-x86_64.zip"
+archive="$dist_dir/Zynesis-$platform-x86_64.zip"
 rm -f "$archive"
 (
     cd "$out"

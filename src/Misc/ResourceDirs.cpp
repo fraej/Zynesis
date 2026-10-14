@@ -1,5 +1,5 @@
 /*
-  Zynth - a ZynAddSubFX-based synthesizer plugin
+  Zynesis - a ZynAddSubFX-based synthesizer plugin
 
   ResourceDirs.cpp - Locate the resources shipped with the plugin binary
 

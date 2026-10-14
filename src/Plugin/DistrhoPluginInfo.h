@@ -1,5 +1,5 @@
 /*
-  Zynth - a synthesizer plugin based on ZynAddSubFX
+  Zynesis - a synthesizer plugin based on ZynAddSubFX
 
   DistrhoPluginInfo.h - DPF information header
   Copyright (C) 2015-2016 Filipe Coelho
@@ -14,15 +14,15 @@
 #ifndef DISTRHO_PLUGIN_INFO_H_INCLUDED
 #define DISTRHO_PLUGIN_INFO_H_INCLUDED
 
-#define DISTRHO_PLUGIN_BRAND    "Zynth"
-#define DISTRHO_PLUGIN_NAME     "Zynth"
+#define DISTRHO_PLUGIN_BRAND    "Zynesis"
+#define DISTRHO_PLUGIN_NAME     "Zynesis"
 #define DISTRHO_PLUGIN_URI      "https://github.com/fraej/zyn-vst3"
-#define DISTRHO_PLUGIN_CLAP_ID  "io.github.fraej.zynth"
+#define DISTRHO_PLUGIN_CLAP_ID  "io.github.fraej.zynesis"
 
 // Plugin identity: distinct from upstream ZynAddSubFX ('ZASF') so both can
 // be installed side by side.  The VST3 class IDs derive from these.
-#define DISTRHO_PLUGIN_BRAND_ID  Znth
-#define DISTRHO_PLUGIN_UNIQUE_ID Zyth
+#define DISTRHO_PLUGIN_BRAND_ID  Zyns
+#define DISTRHO_PLUGIN_UNIQUE_ID Zyne
 
 #define DISTRHO_PLUGIN_CLAP_FEATURES   "instrument", "synthesizer", "stereo"
 #define DISTRHO_PLUGIN_VST3_CATEGORIES "Instrument|Synth"

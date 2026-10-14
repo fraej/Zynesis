@@ -1,6 +1,6 @@
 = Zyn-Fusion User Interface
 
-The Zyn-Fusion editor runtime (libzest), built on mruby-zest. The Zynth
+The Zyn-Fusion editor runtime (libzest), built on mruby-zest. The Zynesis
 plugins load it to draw their editor; `scripts/build.sh` builds it through
 this directory's Makefile.
 

@@ -102,7 +102,7 @@ include_directories(
     ${CMAKE_CURRENT_BINARY_DIR})
 link_directories(${FFTW3F_LIBRARY_DIRS} ${MXML_LIBRARY_DIRS} ${LIBLO_LIBRARY_DIRS})
 
-add_library(zynth_core STATIC
+add_library(zynesis_core STATIC
     version.cpp
     globals.cpp
     ../tlsf/tlsf.c
@@ -176,7 +176,7 @@ add_library(zynth_core STATIC
     Synth/WatchPoint.cpp
     UI/ConnectionDummy.cpp)
 
-target_link_libraries(zynth_core PUBLIC
+target_link_libraries(zynesis_core PUBLIC
     ${ZLIB_LIBRARIES}
     ${FFTW3F_LIBRARIES}
     ${MXML_LIBRARIES}
@@ -187,7 +187,7 @@ target_link_libraries(zynth_core PUBLIC
     rtosc-cpp)
 
 if(Werror)
-    target_compile_options(zynth_core PRIVATE -Werror)
+    target_compile_options(zynesis_core PRIVATE -Werror)
 endif()
 
 add_subdirectory(Plugin)

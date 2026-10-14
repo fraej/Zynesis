@@ -1,7 +1,7 @@
 /*
-  Zynth - a synthesizer plugin based on ZynAddSubFX
+  Zynesis - a synthesizer plugin based on ZynAddSubFX
 
-  Zynth.cpp - DPF plugin wrapping the ZynAddSubFX synth core
+  Zynesis.cpp - DPF plugin wrapping the ZynAddSubFX synth core
   Copyright (C) 2015-2016 Filipe Coelho
   Author: Filipe Coelho
 
@@ -107,12 +107,12 @@ private:
 };
 
 /* ------------------------------------------------------------------------------------------------------------
- * Zynth plugin class */
+ * Zynesis plugin class */
 
-class Zynth : public Plugin
+class Zynesis : public Plugin
 {
 public:
-    Zynth()
+    Zynesis()
         : Plugin(kParamCount, 1, 1), // 1 program, 1 state
           master(nullptr),
           middleware(nullptr),
@@ -143,7 +143,7 @@ public:
         middlewareThread->start(middleware);
     }
 
-    ~Zynth() override
+    ~Zynesis() override
     {
         middlewareThread->stop();
         _deleteMaster();
@@ -159,7 +159,7 @@ protected:
     */
     const char* getLabel() const noexcept override
     {
-        return "Zynth";
+        return "Zynesis";
     }
 
    /**
@@ -178,7 +178,7 @@ protected:
     */
     const char* getMaker() const noexcept override
     {
-        return "Zynth";
+        return "Zynesis";
     }
 
    /**
@@ -595,7 +595,7 @@ private:
 
     static void __masterChangedCallback(void* ptr, zyn::Master* m)
     {
-        ((Zynth*)ptr)->_masterChangedCallback(m);
+        ((Zynesis*)ptr)->_masterChangedCallback(m);
     }
 
    /* -------------------------------------------------------------------------------------------------------- */
@@ -622,7 +622,7 @@ private:
 
     static void __uiCallback(void* ptr, const char* msg)
     {
-        ((Zynth*)ptr)->_uiCallback(msg);
+        ((Zynesis*)ptr)->_uiCallback(msg);
     }
 
    /* -------------------------------------------------------------------------------------------------------- */
@@ -635,10 +635,10 @@ private:
 
     static void __idleCallback(void* ptr)
     {
-        ((Zynth*)ptr)->_idleCallback();
+        ((Zynesis*)ptr)->_idleCallback();
     }
 
-    DISTRHO_DECLARE_NON_COPY_CLASS(Zynth)
+    DISTRHO_DECLARE_NON_COPY_CLASS(Zynesis)
 };
 
 /* ------------------------------------------------------------------------------------------------------------
@@ -649,7 +649,7 @@ START_NAMESPACE_DISTRHO
 Plugin* createPlugin()
 {
     zyn::isPlugin = true;
-    return new Zynth();
+    return new Zynesis();
 }
 
 END_NAMESPACE_DISTRHO

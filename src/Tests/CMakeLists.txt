@@ -2,7 +2,7 @@ function(quick_test test_name)
     add_executable(${test_name} "${test_name}.cpp")
     add_test(NAME ${test_name}
              COMMAND ${test_name})
-    target_link_libraries(${test_name} zynth_core ${ARGN})
+    target_link_libraries(${test_name} zynesis_core ${ARGN})
 endfunction()
 
 #for tests looking for files stored in the source dir
@@ -43,7 +43,7 @@ if(NOT WIN32)
 
     add_executable(save-osc SaveOSC.cpp)
     target_compile_definitions(save-osc PRIVATE -DZYN_GIT_WORKTREE="${CMAKE_SOURCE_DIR}")
-    target_link_libraries(save-osc zynth_core)
+    target_link_libraries(save-osc zynesis_core)
     # test all presets
     add_test(SaveOscPresets save-osc)
     # test the most insane XIZ file
