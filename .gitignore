@@ -1,23 +1,11 @@
-# Keep these patterns anchored: the vendored DPF, RtOsc and Zyn-Fusion trees
-# contain source directories named "build", "package", etc.
-
 # Editor and OS files
 *~
 *.swp
 .DS_Store
 
-# Build directories and packages
+# Build directories and packages.  Keep these anchored: the vendored trees
+# contain source directories named "build".
 /build*/
 /dist/
 CMakeCache.txt
 CMakeFiles/
-
-# Zyn-Fusion is built in-tree by zyn-fusion-ui/Makefile; see also
-# zyn-fusion-ui/.gitignore
-*.o
-/zyn-fusion-ui/libzest.dll
-/zyn-fusion-ui/zest.exe
-/zyn-fusion-ui/deps/libuv-win.a
-/zyn-fusion-ui/mruby/bin/
-/zyn-fusion-ui/mruby/build/
-/zyn-fusion-ui/src/osc-bridge/libosc-bridge.a

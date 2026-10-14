@@ -3,7 +3,7 @@
 # (FFTW single precision, Mini-XML, zlib and liblo) with MinGW-w64.
 #
 # The result is a prefix with include/ and lib/ that
-# scripts/build-vst3-windows.sh consumes through WIN_DEPS_PREFIX.
+# `scripts/build-vst3.sh windows` consumes through WIN_DEPS_PREFIX.
 set -euo pipefail
 
 root_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)

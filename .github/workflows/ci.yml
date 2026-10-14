@@ -1,12 +1,22 @@
 ---
-name: VST3
+name: CI
 'on': [push, pull_request]
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  lint:
+    name: YAML lint
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out
+        uses: actions/checkout@v4
+      # DPF, RtOsc and Zyn-Fusion are vendored upstream trees.
+      - name: Run yamllint
+        run: yamllint $(git ls-files '*.yml' ':!:DPF' ':!:rtosc' ':!:zyn-fusion-ui')
+
   linux:
-    name: Linux VST3
+    name: Linux (tests and VST3)
     runs-on: ubuntu-24.04
     steps:
       - name: Check out
@@ -15,17 +25,22 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
-            bison cmake pkg-config ruby rake \
+            bison cmake pkg-config ruby rake zip \
             libfftw3-dev libmxml-dev liblo-dev zlib1g-dev libuv1-dev \
             libx11-dev libxcursor-dev libxext-dev libxrandr-dev \
             libgl-dev libglx-dev libopengl-dev libdbus-1-dev
-      - name: Build
-        run: ./scripts/build-vst3-linux.sh
-      - name: Upload bundle
+      - name: Build and run the tests
+        run: |
+          cmake -S . -B build-tests
+          cmake --build build-tests --parallel
+          ctest --test-dir build-tests --output-on-failure
+      - name: Build the VST3
+        run: ./scripts/build-vst3.sh linux
+      - name: Upload the bundle
         uses: actions/upload-artifact@v4
         with:
           name: ZynAddSubFX-linux-x86_64
-          path: build-vst3/bin/ZynAddSubFX.vst3
+          path: dist/linux/ZynAddSubFX.vst3
 
   windows:
     name: Windows VST3 (MinGW-w64 cross-build)
@@ -38,17 +53,17 @@ jobs:
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
             gcc-mingw-w64-x86-64-posix g++-mingw-w64-x86-64-posix \
-            autoconf automake libtool bison cmake ninja-build make \
-            ruby rake zip
-      - name: Cache Windows dependencies
+            autoconf automake libtool bison cmake make pkg-config \
+            ruby rake zip curl
+      - name: Cache the Windows dependencies
         uses: actions/cache@v4
         with:
           path: build-win-deps/prefix
           key: win-deps-${{ hashFiles('scripts/build-windows-deps.sh') }}
-      - name: Build
-        run: ./scripts/build-vst3-windows.sh
-      - name: Upload bundle
+      - name: Build the VST3
+        run: ./scripts/build-vst3.sh windows
+      - name: Upload the bundle
         uses: actions/upload-artifact@v4
         with:
           name: ZynAddSubFX-windows-x86_64
-          path: dist/ZynAddSubFX.vst3
+          path: dist/windows/ZynAddSubFX.vst3
