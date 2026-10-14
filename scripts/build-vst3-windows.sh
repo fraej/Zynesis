@@ -1,41 +1,43 @@
 #!/usr/bin/env bash
+# Cross-compile the Windows x86_64 VST3 bundle from Linux with MinGW-w64.
 set -euo pipefail
 
 root_dir=$(CDPATH= cd -- "$(dirname -- "$0")/.." && pwd)
+host=${MINGW_HOST:-x86_64-w64-mingw32}
 build_dir=${BUILD_DIR:-"$root_dir/build-vst3-win"}
-deps_prefix=${WIN_DEPS_PREFIX:-/tmp/zyn-win-deps/prefix}
+deps_prefix=${WIN_DEPS_PREFIX:-"$root_dir/build-win-deps/prefix"}
 dist_dir=${DIST_DIR:-"$root_dir/dist"}
 package_dir=${PACKAGE_DIR:-"$dist_dir/ZynAddSubFX.vst3"}
 archive=${WINDOWS_ARCHIVE:-"$dist_dir/ZynAddSubFX-windows-x86_64.zip"}
 fusion_dir="$root_dir/zyn-fusion-ui"
 
-if [[ ! -d "$fusion_dir" ]]; then
-    echo "bundled zyn-fusion-ui directory is missing" >&2
-    exit 1
-fi
-if [[ ! -f "$deps_prefix/include/fftw3.h" || ! -f "$deps_prefix/lib/libfftw3f.a" ]]; then
-    echo "Windows dependencies are missing under $deps_prefix" >&2
-    echo "Set WIN_DEPS_PREFIX to the cross-compiled dependency prefix." >&2
-    exit 1
+for tool in "$host-gcc" "$host-g++" "$host-ar" cmake ninja ruby rake zip; do
+    if ! command -v "$tool" >/dev/null; then
+        echo "missing required tool: $tool" >&2
+        exit 1
+    fi
+done
+
+if [[ ! -f "$deps_prefix/lib/libfftw3f.a" || ! -f "$deps_prefix/lib/libmxml.a" ||
+      ! -f "$deps_prefix/lib/libz.a" || ! -f "$deps_prefix/lib/liblo.a" ]]; then
+    WIN_DEPS_PREFIX="$deps_prefix" "$root_dir/scripts/build-windows-deps.sh"
 fi
 
+# Zyn-Fusion builds in-tree.  Delete zyn-fusion-ui/libzest.dll to force a
+# rebuild.  mruby/build is shared with the Linux build, which configures the
+# same build names differently, so always start it clean.
 if [[ ! -f "$fusion_dir/libzest.dll" ]]; then
-    make -C "$fusion_dir" windows
+    rm -rf "$fusion_dir/mruby/build"
+    CC="$host-gcc" CXX="$host-g++" AR="$host-ar" make -C "$fusion_dir" windows
 fi
 
 cmake -S "$root_dir" -B "$build_dir" -G Ninja \
     -DCMAKE_TOOLCHAIN_FILE="$root_dir/cmake/mingw-w64-x86_64.cmake" \
+    -DZYN_WIN_DEPS_PREFIX="$deps_prefix" \
     -DGuiModule=zest -DPluginEnable=ON -DVst3Enable=ON \
     -DLegacyPluginFormats=OFF -DCompileTests=OFF -DWerror=OFF \
     -DAlsaEnable=OFF -DJackEnable=OFF -DOssEnable=OFF -DSndioEnable=OFF \
-    -DPaEnable=OFF -DLashEnable=OFF \
-    -DFFTW3F_INCLUDE_DIR="$deps_prefix/include" \
-    -DFFTW3F_LIBRARY_DIRS="$deps_prefix/lib" \
-    -DMXML_INCLUDE_DIR="$deps_prefix/include" \
-    -DMXML_LIBRARY_DIRS="$deps_prefix/lib" \
-    -DLIBLO_INCLUDE_DIR="$deps_prefix/include" \
-    -DLIBLO_LIBRARY_DIRS="$deps_prefix/lib" \
-    -DZLIB_ROOT="$deps_prefix"
+    -DPaEnable=OFF -DLashEnable=OFF
 cmake --build "$build_dir" --target ZynAddSubFX-vst3 --parallel
 
 source_bundle="$build_dir/bin/ZynAddSubFX.vst3"
@@ -47,18 +49,24 @@ mkdir -p "$dist_dir"
 cp -a "$source_bundle" "$package_dir"
 mkdir -p "$arch_dir" "$resources/licenses"
 
-# The Windows loader resolves libzest.dll and its QML/resources beside the
-# VST3 module, so these assets belong in Contents/x86_64-win.
-cp "$fusion_dir/libzest.dll" "$arch_dir/libzest.dll"
-for dir in font qml schema; do
-    rm -rf "$arch_dir/$dir"
-    cp -a "$fusion_dir/package/$dir" "$arch_dir/$dir"
-done
-rm -rf "$arch_dir/banks"
-cp -a "$root_dir/instruments/banks" "$arch_dir/banks"
+# libzest.dll is loaded from beside the VST3 module and looks up its QML,
+# schema and fonts relative to its own location, so these assets belong in
+# Contents/x86_64-win.  This mirrors zyn-fusion-ui's `make pack`, which only
+# supports the Linux runtime.
+cp "$fusion_dir/libzest.dll" "$arch_dir/"
+mkdir -p "$arch_dir/qml" "$arch_dir/schema" "$arch_dir/font"
+cp "$fusion_dir"/src/mruby-zest/qml/* "$fusion_dir"/src/mruby-zest/example/* "$arch_dir/qml/"
+cp "$fusion_dir/src/osc-bridge/schema/test.json" "$arch_dir/schema/"
+cp "$fusion_dir"/deps/nanovg/example/*.ttf "$arch_dir/font/"
+
+cp -a "$root_dir/instruments/banks" "$resources/banks"
 
 cp "$root_dir/COPYING" "$resources/licenses/zynaddsubfx-GPL-2.0.txt"
-cp "$fusion_dir/COPYING" "$resources/licenses/zyn-fusion-GPL-2.0.txt" 2>/dev/null || true
+cp "$fusion_dir/LICENSE" "$resources/licenses/zyn-fusion-LGPL-2.1.txt"
+cp "$root_dir/DPF/LICENSE" "$resources/licenses/DPF-ISC.txt"
+if [[ -d "$deps_prefix/share/licenses" ]]; then
+    cp -a "$deps_prefix/share/licenses/." "$resources/licenses/"
+fi
 
 rm -f "$archive"
 (

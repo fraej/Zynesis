@@ -374,13 +374,22 @@ void Bank::rescanforbanks()
             scanrootdir(config->cfg.bankRootDirList[i]);
 #ifdef WIN32
     {
-        //Search the VST Directory for banks/preset/etc
+        // Resolve the module containing this code rather than looking it up
+        // by name: the VST3 module is ZynAddSubFX.vst3, not ZynAddSubFX.dll.
+        // Search beside it (VST2 layout) and in the VST3 bundle's
+        // Contents/Resources/banks.
+        HMODULE module = nullptr;
         char path[1024];
-        GetModuleFileName(GetModuleHandle("ZynAddSubFX.dll"), path, sizeof(path));
-        if(strstr(path, "ZynAddSubFX.dll")) {
-            strstr(path, "ZynAddSubFX.dll")[0] = 0;
-            strcat(path, "banks");
-            scanrootdir(path);
+        if(GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+                                  GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                              reinterpret_cast<LPCSTR>(&INSTRUMENT_EXTENSION),
+                              &module) &&
+           GetModuleFileNameA(module, path, sizeof(path))) {
+            const std::filesystem::path moduleDir =
+                std::filesystem::path(path).parent_path();
+            scanrootdir((moduleDir / "banks").string());
+            scanrootdir((moduleDir / "../Resources/banks")
+                            .lexically_normal().string());
         }
     }
 #endif
